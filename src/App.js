@@ -1,23 +1,55 @@
-import logo from './logo.svg';
+import Header from './Header';
 import './App.css';
+import Footer from './Footer';
+import Todos from './Todos';
+import AddTodo from './AddTodo';
+import React, { useState, useEffect } from 'react';
 
 function App() {
+  let initTodo;
+  if (localStorage.getItem("todosArray") === null) {
+    initTodo = [];
+  }
+  else {
+    initTodo = JSON.parse(localStorage.getItem("todosArray"));
+  }
+
+  const onDelete = (Proptodoitem) => {
+    console.log("Deleted Todo", Proptodoitem);
+    setTodos(todosArray.filter((element) => element !== Proptodoitem))
+    localStorage.setItem("todosArray", JSON.stringify(todosArray));
+  }
+
+  const onAdd = (title, desc) => {
+    console.log("Adding Todo", title, desc)
+    let sno;
+    if (todosArray.length === 0) {
+      sno = 0;
+    }
+    else {
+      sno = todosArray[todosArray.length - 1].sno + 1;
+    }
+    const newTodo = {
+      sno: sno,
+      title: title,
+      desc: desc
+    }
+    setTodos([...todosArray, newTodo]);
+    console.log(newTodo);
+
+  }
+
+  const [todosArray, setTodos] = useState(initTodo)
+  useEffect(() => {
+    localStorage.setItem("todosArray", JSON.stringify(todosArray));
+  }, [todosArray])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Header searchBar={true} title="My Todo List" />
+      <AddTodo AddTodos={onAdd} />
+      <Todos Proptodos={todosArray} DeleteTodo={onDelete} />
+      <Footer />
     </div>
   );
 }
